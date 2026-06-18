@@ -1,0 +1,54 @@
+name: Fetch New Articles
+
+on:
+  workflow_dispatch:
+  # schedule отключён — автопуш ломал картинки (SVG без Gemini в CI)
+  # schedule:
+  #   - cron: '0 6 * * 1'
+
+concurrency:
+  group: fetch-articles
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-articles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Fetch up to 10 new articles
+        run: node scripts/fetch-articles.js
+        env:
+          CI: true
+          TARGET_COUNT: 9999
+          MAX_NEW: 10
+          SKIP_IMAGES: false
+          IMAGE_PROVIDER: gemini
+          AI_PROVIDER: deepseek
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+
+      - name: Seed comments for new articles
+        run: node scripts/seed-comments.js
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/content/stories/ public/images/
+          git diff --staged --quiet || git commit -m "chore: add new articles from RSS"
+          git pull --rebase origin main
+          git push

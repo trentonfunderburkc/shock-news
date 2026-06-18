@@ -1,0 +1,30 @@
+{
+  "name": "shock-news",
+  "type": "module",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "generate:authors": "node scripts/generate-authors.js",
+    "fetch:articles": "node scripts/fetch-articles.js",
+    "fetch:articles:reset": "node scripts/fetch-articles.js --reset --confirm-reset",
+    "seed:comments": "node scripts/seed-comments.js",
+    "fix:images": "node scripts/fix-images.js",
+    "setup:content": "npm run generate:authors && npm run fetch:articles:reset && npm run seed:comments"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.1",
+    "astro": "^6.4.6",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "gray-matter": "^4.0.3",
+    "openai": "^4.104.0",
+    "rss-parser": "^3.13.0",
+    "tailwindcss": "^4.3.1"
+  }
+}

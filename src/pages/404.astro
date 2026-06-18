@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../lib/site';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title={`Страница не найдена — ${site.name}`} description="Запрашиваемая страница не найдена" noindex={true}>
+  <Header slot="header" />
+  <Footer slot="footer" />
+
+  <div class="mx-auto max-w-lg px-4 py-20 text-center">
+    <p class="text-6xl font-headline font-bold text-[#c41e3a]">404</p>
+    <h1 class="font-headline text-2xl font-bold text-gray-900 mt-4">Страница не найдена</h1>
+    <p class="text-gray-600 mt-2">Возможно, материал был удалён или адрес введён неверно.</p>
+    <a href={base} class="inline-block mt-8 bg-[#c41e3a] text-white px-6 py-3 text-sm font-medium hover:bg-[#9a1830] transition-colors">
+      На главную
+    </a>
+  </div>
+</Layout>
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+</style>

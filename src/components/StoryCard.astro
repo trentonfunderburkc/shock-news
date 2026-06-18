@@ -1,0 +1,105 @@
+---
+import { formatDateRu, categorySlug, categoryUrl } from '../lib/site';
+
+interface Props {
+  story: {
+    id: string;
+    data: {
+      title: string;
+      author: string;
+      authorId: number;
+      date: Date;
+      category: string;
+      image: string;
+      source_name: string;
+    };
+  };
+  featured?: boolean;
+}
+
+const { story, featured = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const dateStr = formatDateRu(story.data.date);
+const catSlug = categorySlug(story.data.category);
+---
+
+{featured ? (
+  <article class="group relative overflow-hidden bg-white border border-gray-200">
+    <a href={`${base}stories/${story.id}/`} class="block">
+      <div class="grid lg:grid-cols-2">
+        <div class="relative aspect-[16/10] lg:aspect-auto lg:min-h-[360px] overflow-hidden">
+          <img
+            src={`${base}${story.data.image.replace(/^\//, '')}`}
+            alt={story.data.title}
+            loading="eager"
+            width="800"
+            height="500"
+            class="absolute inset-0 h-full w-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+          />
+          <span class="absolute top-4 left-4 bg-[#c41e3a] text-white text-xs font-bold uppercase tracking-wider px-3 py-1">
+            Главное
+          </span>
+        </div>
+        <div class="flex flex-col justify-center p-6 lg:p-10">
+          <a
+            href={categoryUrl(catSlug, base)}
+            class="inline-block w-fit text-xs font-bold uppercase tracking-wider text-[#c41e3a] hover:underline mb-3"
+          >
+            {story.data.category}
+          </a>
+          <h2 class="font-headline text-2xl lg:text-3xl font-bold text-gray-900 leading-tight group-hover:text-[#c41e3a] transition-colors mb-4">
+            {story.data.title}
+          </h2>
+          <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500 mt-auto">
+            <a href={`${base}authors/${story.data.authorId}/`} class="font-medium text-gray-700 hover:text-[#c41e3a]">
+              {story.data.author}
+            </a>
+            <span aria-hidden="true">·</span>
+            <time datetime={story.data.date.toISOString()}>{dateStr}</time>
+          </div>
+        </div>
+      </div>
+    </a>
+  </article>
+) : (
+  <article
+    class="story-card group flex flex-col bg-white border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all"
+    data-category={story.data.category}
+  >
+    <a href={`${base}stories/${story.id}/`} class="block overflow-hidden">
+      <div class="aspect-[16/10] overflow-hidden">
+        <img
+          src={`${base}${story.data.image.replace(/^\//, '')}`}
+          alt={story.data.title}
+          loading="lazy"
+          width="400"
+          height="250"
+          class="h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+        />
+      </div>
+    </a>
+    <div class="flex flex-1 flex-col p-4">
+      <a
+        href={categoryUrl(catSlug, base)}
+        class="mb-2 inline-block w-fit text-xs font-bold uppercase tracking-wider text-[#c41e3a] hover:underline"
+      >
+        {story.data.category}
+      </a>
+      <h2 class="font-headline mb-2 text-lg font-bold leading-snug text-gray-900 group-hover:text-[#c41e3a] transition-colors line-clamp-3">
+        <a href={`${base}stories/${story.id}/`}>{story.data.title}</a>
+      </h2>
+      <div class="mt-auto flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-100">
+        <a href={`${base}authors/${story.data.authorId}/`} class="hover:text-[#c41e3a] transition-colors">
+          {story.data.author}
+        </a>
+        <time datetime={story.data.date.toISOString()}>{dateStr}</time>
+      </div>
+    </div>
+  </article>
+)}
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+</style>

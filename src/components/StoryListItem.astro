@@ -1,0 +1,58 @@
+---
+import { formatDateShort, categorySlug, categoryUrl } from '../lib/site';
+
+interface Props {
+  story: {
+    id: string;
+    data: {
+      title: string;
+      date: Date;
+      category: string;
+      image: string;
+    };
+  };
+  index?: number;
+}
+
+const { story, index } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const catSlug = categorySlug(story.data.category);
+---
+
+<article class="story-card group flex gap-4 py-4 border-b border-gray-200 last:border-0" data-category={story.data.category}>
+  {index !== undefined && (
+    <span class="hidden sm:flex h-8 w-8 shrink-0 items-center justify-center bg-gray-100 text-sm font-bold text-gray-500">
+      {index}
+    </span>
+  )}
+  <a href={`${base}stories/${story.id}/`} class="shrink-0 w-24 h-16 sm:w-32 sm:h-20 overflow-hidden">
+    <img
+      src={`${base}${story.data.image.replace(/^\//, '')}`}
+      alt=""
+      loading="lazy"
+      width="128"
+      height="80"
+      class="h-full w-full object-cover group-hover:opacity-90 transition-opacity"
+    />
+  </a>
+  <div class="flex-1 min-w-0">
+    <a
+      href={categoryUrl(catSlug, base)}
+      class="text-[10px] font-bold uppercase tracking-wider text-[#c41e3a] hover:underline"
+    >
+      {story.data.category}
+    </a>
+    <h3 class="font-headline mt-1 text-sm sm:text-base font-bold leading-snug text-gray-900 group-hover:text-[#c41e3a] transition-colors line-clamp-2">
+      <a href={`${base}stories/${story.id}/`}>{story.data.title}</a>
+    </h3>
+    <time class="mt-1 block text-xs text-gray-400" datetime={story.data.date.toISOString()}>
+      {formatDateShort(story.data.date)}
+    </time>
+  </div>
+</article>
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+</style>

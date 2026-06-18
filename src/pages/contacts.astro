@@ -1,0 +1,107 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { site } from '../lib/site';
+
+const { publisher } = site;
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title={`Контакты — ${site.name}`} description="Контактная информация и реквизиты редакции Гражданин">
+  <Header slot="header" />
+  <Footer slot="footer" />
+
+  <div class="mx-auto max-w-7xl px-4 py-6">
+    <Breadcrumbs items={[{ label: 'Главная', href: base }, { label: 'Контакты' }]} />
+
+    <div class="grid gap-8 lg:grid-cols-2">
+      <div class="bg-white border border-gray-200 p-6 sm:p-8">
+        <h1 class="font-headline text-3xl font-bold text-gray-900 mb-6">Контакты</h1>
+
+        <dl class="space-y-5 text-sm">
+          <div>
+            <dt class="font-bold text-gray-900 uppercase text-xs tracking-wider mb-1">Издание</dt>
+            <dd class="text-gray-700">{site.name} — {site.tagline}</dd>
+          </div>
+          <div>
+            <dt class="font-bold text-gray-900 uppercase text-xs tracking-wider mb-1">Юридическое лицо</dt>
+            <dd class="text-gray-700">{publisher.shortName}</dd>
+          </div>
+          <div>
+            <dt class="font-bold text-gray-900 uppercase text-xs tracking-wider mb-1">Главный редактор</dt>
+            <dd class="text-gray-700">{publisher.editorInChief}</dd>
+          </div>
+          <div>
+            <dt class="font-bold text-gray-900 uppercase text-xs tracking-wider mb-1">Зам. главного редактора</dt>
+            <dd class="text-gray-700">{publisher.deputyEditor}</dd>
+          </div>
+          <div>
+            <dt class="font-bold text-gray-900 uppercase text-xs tracking-wider mb-1">Юридический адрес</dt>
+            <dd class="text-gray-700">{publisher.address}</dd>
+          </div>
+          <div>
+            <dt class="font-bold text-gray-900 uppercase text-xs tracking-wider mb-1">Почтовый адрес</dt>
+            <dd class="text-gray-700">{publisher.postalAddress}</dd>
+          </div>
+          <div>
+            <dt class="font-bold text-gray-900 uppercase text-xs tracking-wider mb-1">Телефон</dt>
+            <dd class="space-y-1">
+              <a href={`tel:${publisher.phone.replace(/[\s()-]/g, '')}`} class="block text-[#c41e3a] hover:underline">{publisher.phone}</a>
+              <a href={`tel:${publisher.phoneExtra.replace(/[\s()-]/g, '')}`} class="block text-[#c41e3a] hover:underline">{publisher.phoneExtra}</a>
+            </dd>
+          </div>
+          <div>
+            <dt class="font-bold text-gray-900 uppercase text-xs tracking-wider mb-1">Часы работы</dt>
+            <dd class="text-gray-700">{publisher.workHours}</dd>
+          </div>
+          <div>
+            <dt class="font-bold text-gray-900 uppercase text-xs tracking-wider mb-1">Email</dt>
+            <dd><a href={`mailto:${publisher.email}`} class="text-[#c41e3a] hover:underline">{publisher.email}</a></dd>
+          </div>
+          <div>
+            <dt class="font-bold text-gray-900 uppercase text-xs tracking-wider mb-1">Реквизиты</dt>
+            <dd class="text-gray-700">
+              ИНН {publisher.inn}<br />
+              КПП {publisher.kpp}<br />
+              ОГРН {publisher.ogrn}<br />
+              <span class="text-gray-500">от {publisher.ogrnDate}</span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="space-y-6">
+        <div class="bg-white border border-gray-200 p-6 sm:p-8">
+          <h2 class="font-headline text-xl font-bold text-gray-900 mb-4">Обратная связь</h2>
+          <p class="text-sm text-gray-600 mb-4">
+            По вопросам сотрудничества, размещения рекламы, исправления материалов
+            и обработки персональных данных:
+          </p>
+          <ul class="text-sm space-y-2 text-gray-700">
+            <li>Редакция: <a href={`mailto:${publisher.email}`} class="text-[#c41e3a] hover:underline">{publisher.email}</a></li>
+            <li>Реклама: <a href={`mailto:${publisher.adsEmail}`} class="text-[#c41e3a] hover:underline">{publisher.adsEmail}</a></li>
+            <li>Пресс-служба: <a href={`mailto:${publisher.pressEmail}`} class="text-[#c41e3a] hover:underline">{publisher.pressEmail}</a></li>
+            <li>Персональные данные: <a href={`mailto:${publisher.privacyEmail}`} class="text-[#c41e3a] hover:underline">{publisher.privacyEmail}</a></li>
+          </ul>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 p-6 text-sm text-gray-600 leading-relaxed">
+          <p class="font-bold text-gray-800 mb-2">Для рекламодателей</p>
+          <p>
+            «{site.name}» — информационный ресурс социальной тематики.
+            Размещение рекламы осуществляется в соответствии с законодательством РФ
+            о рекламе. Рекламные материалы отделены от редакционного контента.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+</style>

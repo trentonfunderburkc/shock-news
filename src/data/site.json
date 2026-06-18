@@ -1,0 +1,38 @@
+{
+  "name": "Шок-Новости",
+  "tagline": "Происшествия, криминал и чрезвычайные ситуации",
+  "description": "Оперативные новости о происшествиях, криминале, ДТП и чрезвычайных ситуациях в России и мире",
+  "domain": "shocknews.local",
+  "siteUrl": "https://shocknews.local",
+  "publisher": {
+    "legalName": "Общество с ограниченной ответственностью «Шок Медиа»",
+    "shortName": "ООО «Шок Медиа»",
+    "inn": "7714892635",
+    "kpp": "771401001",
+    "ogrn": "1187746538921",
+    "ogrnDate": "14 мая 2018 г.",
+    "address": "127015, г. Москва, ул. Новодмитровская, д. 2, корп. 1, офис 417",
+    "postalAddress": "127015, г. Москва, а/я 47",
+    "email": "redakcia@shocknews.local",
+    "adsEmail": "ads@shocknews.local",
+    "pressEmail": "press@shocknews.local",
+    "privacyEmail": "privacy@shocknews.local",
+    "phone": "+7 (495) 632-47-18",
+    "phoneExtra": "+7 (495) 632-47-19",
+    "editorInChief": "Костина Елена Владимировна",
+    "deputyEditor": "Морозов Андрей Петрович",
+    "workHours": "Пн–Пт, 10:00–19:00 (МСК)",
+    "bankDetails": "Р/с 40702810438000123456 в ПАО «Сбербанк», БИК 044525225, к/с 30101810400000000225"
+  },
+  "categories": [
+    { "name": "Происшествия", "slug": "proisshestviya" },
+    { "name": "Криминал", "slug": "kriminal" },
+    { "name": "ДТП", "slug": "dtp" },
+    { "name": "ЧП", "slug": "chp" }
+  ],
+  "social": {
+    "telegram": "https://t.me/shocknews_media",
+    "vk": "https://vk.com/shocknews_media",
+    "dzen": "https://dzen.ru/shocknews_media"
+  }
+}

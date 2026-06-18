@@ -1,0 +1,42 @@
+---
+interface Props {
+  url: string;
+  label?: string;
+  goal?: string;
+  variant?: 'primary' | 'secondary';
+}
+
+const {
+  url,
+  label = 'Читать оригинал',
+  goal = 'click_source',
+  variant = 'primary',
+} = Astro.props;
+
+const classes =
+  variant === 'primary'
+    ? 'inline-flex items-center justify-center bg-[#c41e3a] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#9a1830] transition-colors'
+    : 'inline-flex items-center justify-center bg-gray-800 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-900 transition-colors';
+---
+
+<button
+  type="button"
+  class={classes}
+  data-source-url={url}
+  data-goal={goal}
+  data-external="true"
+>
+  {label} ↗
+</button>
+
+<script>
+  document.querySelectorAll('[data-source-url]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const url = btn.getAttribute('data-source-url');
+      const goal = btn.getAttribute('data-goal') || 'click_source';
+      if (url && window.CITIZEN_ANALYTICS) {
+        window.CITIZEN_ANALYTICS.navigateWithDelay(url, goal, '_blank');
+      }
+    });
+  });
+</script>

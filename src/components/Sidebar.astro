@@ -1,0 +1,82 @@
+---
+import StoryListItem from './StoryListItem.astro';
+import { site, categoryUrl } from '../lib/site';
+
+interface Story {
+  id: string;
+  data: {
+    title: string;
+    date: Date;
+    category: string;
+    image: string;
+  };
+}
+
+interface Props {
+  popular: Story[];
+  latest: Story[];
+}
+
+const { popular, latest } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<aside class="space-y-6">
+  <div class="bg-white border border-gray-200 p-5">
+    <h2 class="font-headline text-lg font-bold text-gray-900 pb-3 mb-3 border-b-2 border-[#c41e3a]">
+      Популярное
+    </h2>
+    <div>
+      {popular.map((story, i) => (
+        <StoryListItem story={story} index={i + 1} />
+      ))}
+    </div>
+  </div>
+
+  <div class="bg-white border border-gray-200 p-5">
+    <h2 class="font-headline text-lg font-bold text-gray-900 pb-3 mb-3 border-b-2 border-[#c41e3a]">
+      Последние
+    </h2>
+    <div>
+      {latest.slice(0, 5).map((story) => (
+        <StoryListItem story={story} />
+      ))}
+    </div>
+  </div>
+
+  <div class="bg-white border border-gray-200 p-5">
+    <h2 class="font-headline text-lg font-bold text-gray-900 pb-3 mb-3 border-b-2 border-[#c41e3a]">
+      Рубрики
+    </h2>
+    <ul class="space-y-2">
+      {site.categories.map((cat) => (
+        <li>
+          <a
+            href={categoryUrl(cat.slug, base)}
+            class="flex items-center justify-between text-sm text-gray-700 hover:text-[#c41e3a] transition-colors py-1"
+          >
+            <span>{cat.name}</span>
+            <span class="text-gray-300">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="bg-gray-50 border border-gray-200 p-5 text-xs text-gray-500 leading-relaxed">
+    <p class="font-bold text-gray-700 mb-2">Информация для читателей</p>
+    <p>
+      «{site.name}» — информационный ресурс о пенсиях, налогах и социальных выплатах.
+      Материалы подготовлены редакцией на основе публикаций проверенных СМИ.
+    </p>
+    <a href={`${base}about/`} class="inline-block mt-2 text-[#c41e3a] hover:underline">
+      Подробнее об источниках →
+    </a>
+  </div>
+</aside>
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+</style>

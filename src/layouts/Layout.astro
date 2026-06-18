@@ -1,0 +1,180 @@
+---
+import '../styles/global.css';
+import CookieBanner from '../components/CookieBanner.astro';
+import { site, absoluteUrl } from '../lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  canonical?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title = `${site.name} — ${site.tagline}`,
+  description = site.description,
+  image,
+  type = 'website',
+  canonical,
+  noindex = false,
+  jsonLd,
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const siteUrl = Astro.site?.href?.replace(/\/$/, '') || site.siteUrl;
+const canonicalUrl = canonical || absoluteUrl(Astro.url.pathname.replace(base, ''), siteUrl, base);
+const ogImage = image
+  ? absoluteUrl(image, siteUrl, base)
+  : absoluteUrl('favicon.svg', siteUrl, base);
+
+const enableMetrika = import.meta.env.PUBLIC_ENABLE_METRIKA === 'true';
+const metrikaId = import.meta.env.PUBLIC_YANDEX_METRIKA_ID || import.meta.env.YANDEX_METRIKA_ID || '99999999';
+
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsMediaOrganization',
+  name: site.name,
+  url: `${siteUrl}${base}`,
+  logo: `${siteUrl}${base}favicon.svg`,
+  description: site.description,
+  email: site.publisher.email,
+  telephone: site.publisher.phone,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.publisher.address,
+    addressCountry: 'RU',
+  },
+  sameAs: Object.values(site.social),
+};
+
+const allJsonLd = jsonLd
+  ? Array.isArray(jsonLd)
+    ? [orgJsonLd, ...jsonLd]
+    : [orgJsonLd, jsonLd]
+  : [orgJsonLd];
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content={site.name} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Serif:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>{title}</title>
+
+    {allJsonLd.map((item) => (
+      <script type="application/ld+json" set:html={JSON.stringify(item)} />
+    ))}
+  </head>
+  <body class="min-h-screen flex flex-col antialiased">
+    <slot name="header" />
+    <main class="flex-1">
+      <slot />
+    </main>
+    <slot name="footer" />
+    <CookieBanner enableMetrika={enableMetrika} metrikaId={metrikaId} />
+
+    <script is:inline define:vars={{ analyticsEnabled: enableMetrika, metrikaIdStr: metrikaId }}>
+      window.CITIZEN_ANALYTICS = {
+        enabled: analyticsEnabled,
+        metrikaId: metrikaIdStr,
+        metrikaLoaded: false,
+        reachGoal(goal) {
+          if (typeof ym !== 'undefined') {
+            ym(parseInt(this.metrikaId), 'reachGoal', goal);
+          }
+        },
+        navigateWithDelay(url, goal, target) {
+          this.reachGoal(goal);
+          setTimeout(function () {
+            if (target === '_blank') {
+              window.open(url, '_blank', 'noopener,noreferrer');
+            } else {
+              window.location.href = url;
+            }
+          }, 200);
+        },
+        loadMetrika() {
+          if (this.metrikaLoaded || !this.enabled) return;
+          this.metrikaLoaded = true;
+          (function (m, e, t, r, i, k, a) {
+            m[i] =
+              m[i] ||
+              function () {
+                (m[i].a = m[i].a || []).push(arguments);
+              };
+            m[i].l = 1 * new Date();
+            for (var j = 0; j < document.scripts.length; j++) {
+              if (document.scripts[j].src === r) return;
+            }
+            k = e.createElement(t);
+            a = e.getElementsByTagName(t)[0];
+            k.async = 1;
+            k.src = r;
+            a.parentNode.insertBefore(k, a);
+          })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+          ym(parseInt(this.metrikaId), 'init', {
+            clickmap: true,
+            trackLinks: true,
+            accurateTrackBounce: true,
+          });
+        },
+      };
+
+      if (localStorage.getItem('citizen_cookie_consent') === 'accepted') {
+        window.CITIZEN_ANALYTICS.loadMetrika();
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var startTime = Date.now();
+        setTimeout(function () {
+          if (Date.now() - startTime >= 45000) {
+            window.CITIZEN_ANALYTICS.reachGoal('time_spent');
+          }
+        }, 45000);
+
+        var article = document.getElementById('story-content');
+        if (article) {
+          var reported = false;
+          window.addEventListener('scroll', function () {
+            if (reported) return;
+            var rect = article.getBoundingClientRect();
+            var viewed = window.innerHeight - rect.top;
+            var total = article.offsetHeight;
+            if (total > 0 && viewed / total >= 0.8) {
+              reported = true;
+              window.CITIZEN_ANALYTICS.reachGoal('read_finish');
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

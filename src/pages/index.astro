@@ -1,0 +1,103 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import StoryCard from '../components/StoryCard.astro';
+import StoryListItem from '../components/StoryListItem.astro';
+import CategoryFilter from '../components/CategoryFilter.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getCollection } from 'astro:content';
+import { site } from '../lib/site';
+
+const PER_PAGE = 9;
+const base = import.meta.env.BASE_URL;
+
+const allStories = (await getCollection('stories')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+const categories = [...new Set(allStories.map((s) => s.data.category))].sort();
+const totalPages = Math.ceil(allStories.length / PER_PAGE);
+const currentPage = Math.max(1, Math.min(Number(Astro.url.searchParams.get('page') || 1), totalPages || 1));
+const start = (currentPage - 1) * PER_PAGE;
+const pageStories = allStories.slice(start, start + PER_PAGE);
+
+const featured = allStories[0];
+const gridStories = currentPage === 1 && featured ? pageStories.slice(1) : pageStories;
+const popular = allStories.slice(0, 5);
+const latest = allStories.slice(0, 8);
+---
+
+<Layout title={`${site.name} — ${site.tagline}`} description={site.description}>
+  <Header slot="header" />
+  <Footer slot="footer" />
+
+  <div class="mx-auto max-w-7xl px-4 py-6">
+    <div class="grid gap-8 lg:grid-cols-12">
+      <div class="lg:col-span-8 space-y-6">
+        {currentPage === 1 && featured && (
+          <StoryCard story={featured} featured={true} />
+        )}
+
+        <section class="bg-white border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b-2 border-[#c41e3a]">
+            <h2 class="font-headline text-xl font-bold text-gray-900">Лента новостей</h2>
+            <span class="text-xs text-gray-400">{allStories.length} материалов</span>
+          </div>
+
+          <CategoryFilter categories={categories} />
+
+          <p id="empty-filter-msg" class="hidden text-center text-gray-500 py-12">
+            В этой категории пока нет статей.
+          </p>
+
+          <div id="stories-grid" class="grid gap-5 sm:grid-cols-2">
+            {gridStories.map((story) => (
+              <StoryCard story={story} />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <nav class="mt-8 flex justify-center gap-1 border-t border-gray-100 pt-6" aria-label="Пагинация">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <a
+                  href={page === 1 ? base : `${base}?page=${page}`}
+                  class={`flex h-9 w-9 items-center justify-center text-sm font-medium border transition-colors ${
+                    page === currentPage
+                      ? 'bg-[#c41e3a] text-white border-[#c41e3a]'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-[#c41e3a]'
+                  }`}
+                >
+                  {page}
+                </a>
+              ))}
+            </nav>
+          )}
+        </section>
+
+        {currentPage === 1 && allStories.length > 4 && (
+          <section class="bg-white border border-gray-200 p-5 lg:hidden">
+            <h2 class="font-headline text-lg font-bold text-gray-900 pb-3 mb-3 border-b-2 border-[#c41e3a]">
+              Ещё новости
+            </h2>
+            {allStories.slice(1, 6).map((story) => (
+              <StoryListItem story={story} />
+            ))}
+          </section>
+        )}
+      </div>
+
+      <div class="lg:col-span-4">
+        <div class="lg:sticky lg:top-36">
+          <Sidebar popular={popular} latest={latest} />
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+</style>

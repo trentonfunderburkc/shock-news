@@ -1,0 +1,81 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import StoryCard from '../../components/StoryCard.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { getCollection } from 'astro:content';
+import { site, categoryName } from '../../lib/site';
+
+export async function getStaticPaths() {
+  return site.categories.map((cat) => ({
+    params: { slug: cat.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const name = categoryName(slug!);
+if (!name) return Astro.redirect('/');
+
+const base = import.meta.env.BASE_URL;
+const allStories = (await getCollection('stories')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+const categoryStories = allStories.filter((s) => s.data.category === name);
+const popular = allStories.slice(0, 5);
+const latest = allStories.slice(0, 8);
+---
+
+<Layout
+  title={`${name} — ${site.name}`}
+  description={`Новости рубрики «${name}» на портале ${site.name}`}
+>
+  <Header slot="header" />
+  <Footer slot="footer" />
+
+  <div class="mx-auto max-w-7xl px-4 py-6">
+    <Breadcrumbs
+      items={[
+        { label: 'Главная', href: base },
+        { label: name },
+      ]}
+    />
+
+    <div class="grid gap-8 lg:grid-cols-12">
+      <div class="lg:col-span-8">
+        <div class="bg-white border border-gray-200 p-6 mb-6">
+          <h1 class="font-headline text-3xl font-bold text-gray-900">{name}</h1>
+          <p class="mt-2 text-gray-600">
+            {categoryStories.length} {categoryStories.length === 1 ? 'материал' : 'материалов'} в рубрике
+          </p>
+        </div>
+
+        {categoryStories.length > 0 ? (
+          <div class="grid gap-5 sm:grid-cols-2">
+            {categoryStories.map((story) => (
+              <StoryCard story={story} />
+            ))}
+          </div>
+        ) : (
+          <div class="bg-white border border-gray-200 p-12 text-center text-gray-500">
+            В этой рубрике пока нет опубликованных материалов.
+            <a href={base} class="block mt-2 text-[#c41e3a] hover:underline">Вернуться на главную</a>
+          </div>
+        )}
+      </div>
+
+      <div class="lg:col-span-4">
+        <div class="lg:sticky lg:top-36">
+          <Sidebar popular={popular} latest={latest} />
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+</style>

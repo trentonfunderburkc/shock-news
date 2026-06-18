@@ -1,0 +1,66 @@
+---
+interface Props {
+  enableMetrika: boolean;
+  metrikaId: string;
+}
+
+const { enableMetrika } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<div
+  id="cookie-banner"
+  class="fixed bottom-0 inset-x-0 z-[100] hidden border-t border-gray-200 bg-white shadow-2xl"
+  role="dialog"
+  aria-label="Уведомление о cookies"
+>
+  <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-sm text-gray-600 leading-relaxed max-w-3xl">
+      Мы используем файлы cookie и сервисы аналитики (Яндекс.Метрика) для улучшения работы сайта.
+      Продолжая пользоваться сайтом, вы соглашаетесь с
+      <a href={`${base}cookies/`} class="text-[#c41e3a] underline">политикой cookies</a>
+      и
+      <a href={`${base}privacy/`} class="text-[#c41e3a] underline">обработкой персональных данных</a>.
+    </p>
+    <div class="flex shrink-0 gap-2">
+      <button
+        id="cookie-decline"
+        type="button"
+        class="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+      >
+        Только необходимые
+      </button>
+      <button
+        id="cookie-accept"
+        type="button"
+        class="rounded bg-[#c41e3a] px-4 py-2 text-sm font-medium text-white hover:bg-[#9a1830]"
+      >
+        Принять
+      </button>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ enableMetrika }}>
+  (function () {
+    var banner = document.getElementById('cookie-banner');
+    var consent = localStorage.getItem('citizen_cookie_consent');
+
+    if (!consent && banner) {
+      banner.classList.remove('hidden');
+    }
+
+    document.getElementById('cookie-accept')?.addEventListener('click', function () {
+      localStorage.setItem('citizen_cookie_consent', 'accepted');
+      banner?.classList.add('hidden');
+      if (enableMetrika && window.CITIZEN_ANALYTICS) {
+        window.CITIZEN_ANALYTICS.loadMetrika();
+      }
+    });
+
+    document.getElementById('cookie-decline')?.addEventListener('click', function () {
+      localStorage.setItem('citizen_cookie_consent', 'essential');
+      banner?.classList.add('hidden');
+    });
+  })();
+</script>

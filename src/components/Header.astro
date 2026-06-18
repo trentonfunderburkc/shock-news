@@ -1,0 +1,78 @@
+---
+import { site, categoryUrl } from '../lib/site';
+
+const base = import.meta.env.BASE_URL;
+const today = new Date().toLocaleDateString('ru-RU', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<div class="bg-[#111827] text-gray-300 text-xs">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5">
+    <span class="capitalize hidden sm:inline">{today}</span>
+    <div class="flex items-center gap-4 ml-auto">
+      <a href={`${base}contacts/`} class="hover:text-white transition-colors">{site.publisher.phone}</a>
+      <a href={`mailto:${site.publisher.email}`} class="hover:text-white transition-colors hidden sm:inline">
+        {site.publisher.email}
+      </a>
+    </div>
+  </div>
+</div>
+
+<header class="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
+  <div class="mx-auto max-w-7xl px-4">
+    <div class="flex items-center justify-between gap-4 py-4 border-b border-gray-100">
+      <a href={base} class="group flex items-center gap-3 shrink-0">
+        <span class="flex h-11 w-11 items-center justify-center bg-[#c41e3a] text-xl font-bold text-white font-headline">
+          Г
+        </span>
+        <div>
+          <span class="block text-2xl font-bold text-gray-900 font-headline leading-none tracking-tight group-hover:text-[#c41e3a] transition-colors">
+            {site.name}
+          </span>
+          <span class="block text-xs text-gray-500 uppercase tracking-widest mt-0.5">{site.tagline}</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700">
+        <a href={`${base}about/`} class="hover:text-[#c41e3a] transition-colors">О проекте</a>
+        <a href={`${base}editorial/`} class="hover:text-[#c41e3a] transition-colors">Редакция</a>
+        <a href={`${base}authors/`} class="hover:text-[#c41e3a] transition-colors">Авторы</a>
+        <a href={`${base}contacts/`} class="hover:text-[#c41e3a] transition-colors">Контакты</a>
+      </nav>
+    </div>
+
+    <nav class="flex items-center gap-1 overflow-x-auto py-2 -mx-4 px-4 scrollbar-hide" aria-label="Рубрики">
+      <a
+        href={base}
+        class="shrink-0 px-3 py-1.5 text-sm font-medium text-gray-900 hover:text-[#c41e3a] border-b-2 border-transparent hover:border-[#c41e3a] transition-colors"
+      >
+        Все новости
+      </a>
+      {site.categories.map((cat) => (
+        <a
+          href={categoryUrl(cat.slug, base)}
+          class="shrink-0 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-[#c41e3a] border-b-2 border-transparent hover:border-[#c41e3a] transition-colors"
+        >
+          {cat.name}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>

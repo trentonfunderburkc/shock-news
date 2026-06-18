@@ -1,0 +1,186 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SourceButton from '../../components/SourceButton.astro';
+import Comments from '../../components/Comments.astro';
+import StoryCard from '../../components/StoryCard.astro';
+import StoryListItem from '../../components/StoryListItem.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import EditorialNotice from '../../components/EditorialNotice.astro';
+import { getCollection, getEntry, render } from 'astro:content';
+import { getAuthorById } from '../../lib/authors';
+import { site, formatDateRu, categorySlug, categoryUrl, absoluteUrl } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const stories = await getCollection('stories');
+  return stories.map((story) => ({
+    params: { slug: story.id },
+  }));
+}
+
+const { slug } = Astro.params;
+const story = await getEntry('stories', slug!);
+if (!story) return Astro.redirect('/');
+
+const { Content } = await render(story);
+const author = getAuthorById(story.data.authorId);
+const base = import.meta.env.BASE_URL;
+const siteUrl = Astro.site?.href?.replace(/\/$/, '') || '';
+const catSlug = categorySlug(story.data.category);
+
+const allStories = await getCollection('stories');
+const sorted = allStories.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const relatedStories = sorted
+  .filter((s) => s.data.category === story.data.category && s.id !== story.id)
+  .slice(0, 3);
+const popular = sorted.slice(0, 5);
+const latest = sorted.slice(0, 8);
+
+const dateStr = formatDateRu(story.data.date);
+const articleUrl = absoluteUrl(`stories/${story.id}/`, siteUrl, base);
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: story.data.title,
+  datePublished: story.data.date.toISOString(),
+  dateModified: story.data.date.toISOString(),
+  author: {
+    '@type': 'Person',
+    name: story.data.author,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: site.publisher.legalName,
+    logo: {
+      '@type': 'ImageObject',
+      url: absoluteUrl('favicon.svg', siteUrl, base),
+    },
+  },
+  image: absoluteUrl(story.data.image, siteUrl, base),
+  mainEntityOfPage: articleUrl,
+  description: story.data.title,
+  isBasedOn: story.data.source_url,
+};
+---
+
+<Layout
+  title={`${story.data.title} — ${site.name}`}
+  description={story.data.title}
+  image={story.data.image}
+  type="article"
+  canonical={articleUrl}
+  jsonLd={articleJsonLd}
+>
+  <Header slot="header" />
+  <Footer slot="footer" />
+
+  <div class="mx-auto max-w-7xl px-4 py-6">
+    <Breadcrumbs
+      items={[
+        { label: 'Главная', href: base },
+        { label: story.data.category, href: categoryUrl(catSlug, base) },
+        { label: story.data.title },
+      ]}
+    />
+
+    <div class="grid gap-8 lg:grid-cols-12">
+      <article class="lg:col-span-8">
+        <div class="bg-white border border-gray-200">
+          <header class="p-6 sm:p-8 border-b border-gray-100">
+            <a
+              href={categoryUrl(catSlug, base)}
+              class="inline-block text-xs font-bold uppercase tracking-wider text-[#c41e3a] hover:underline mb-3"
+            >
+              {story.data.category}
+            </a>
+            <h1 class="font-headline text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-4">
+              {story.data.title}
+            </h1>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500">
+              {author && (
+                <a href={`${base}authors/${author.id}/`} class="flex items-center gap-2 hover:text-[#c41e3a] transition-colors">
+                  <img
+                    src={`${base}${author.avatar.replace(/^\//, '')}`}
+                    alt={author.name}
+                    width="36"
+                    height="36"
+                    class="h-9 w-9 rounded-full object-cover"
+                  />
+                  <span class="font-medium text-gray-800">{author.name}</span>
+                </a>
+              )}
+              <time datetime={story.data.date.toISOString()}>{dateStr}</time>
+              <span class="text-gray-400">|</span>
+              <span>Источник: <strong class="text-gray-700">{story.data.source_name}</strong></span>
+              {story.data.original_author && (
+                <>
+                  <span class="text-gray-400">|</span>
+                  <span>Автор источника: {story.data.original_author}</span>
+                </>
+              )}
+            </div>
+          </header>
+
+          <figure class="relative">
+            <img
+              src={`${base}${story.data.image.replace(/^\//, '')}`}
+              alt={story.data.title}
+              loading="eager"
+              width="900"
+              height="506"
+              class="w-full aspect-[16/9] object-cover"
+            />
+            <figcaption class="px-6 py-2 text-xs text-gray-400 bg-gray-50 border-b border-gray-100">
+              {story.data.image_credit}
+            </figcaption>
+          </figure>
+
+          <div class="p-6 sm:p-8">
+            <EditorialNotice />
+
+            <div id="story-content" class="prose-citizen mt-6">
+              <Content />
+            </div>
+
+            <div class="mt-8 flex flex-wrap gap-3 pt-6 border-t border-gray-100">
+              <SourceButton url={story.data.source_url} label="Читать оригинал на сайте источника" goal="click_source" />
+              {story.data.help_link && (
+                <SourceButton url={story.data.help_link} label="Помочь проекту" goal="click_help" variant="secondary" />
+              )}
+            </div>
+          </div>
+        </div>
+
+        <Comments comments={story.data.comments} />
+
+        {relatedStories.length > 0 && (
+          <section class="mt-8 bg-white border border-gray-200 p-6">
+            <h2 class="font-headline text-xl font-bold text-gray-900 pb-3 mb-4 border-b-2 border-[#c41e3a]">
+              Читайте также
+            </h2>
+            <div class="space-y-0">
+              {relatedStories.map((s) => (
+                <StoryListItem story={s} />
+              ))}
+            </div>
+          </section>
+        )}
+      </article>
+
+      <div class="lg:col-span-4">
+        <div class="lg:sticky lg:top-36">
+          <Sidebar popular={popular} latest={latest} />
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+</style>

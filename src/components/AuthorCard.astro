@@ -1,0 +1,40 @@
+---
+import type { Author } from '../lib/authors';
+
+interface Props {
+  author: Author;
+}
+
+const { author } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<article class="flex flex-col bg-white border border-gray-200 p-6 hover:border-gray-300 hover:shadow-sm transition-all">
+  <div class="flex items-start gap-4">
+    <img
+      src={`${base}${author.avatar.replace(/^\//, '')}`}
+      alt={author.name}
+      width="80"
+      height="80"
+      class="h-20 w-20 rounded-full object-cover shrink-0"
+      loading="lazy"
+    />
+    <div>
+      <h3 class="font-headline text-lg font-bold text-gray-900">{author.name}</h3>
+      <p class="text-sm font-medium text-[#c41e3a]">{author.role}</p>
+    </div>
+  </div>
+  <p class="mt-4 text-sm text-gray-600 leading-relaxed flex-1">{author.bio}</p>
+  <a
+    href={`${base}authors/${author.id}/`}
+    class="mt-4 inline-flex items-center text-sm font-medium text-gray-800 hover:text-[#c41e3a] transition-colors"
+  >
+    Все статьи автора →
+  </a>
+</article>
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+</style>

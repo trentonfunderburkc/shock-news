@@ -1,0 +1,6 @@
+[
+  { "name": "МК — Происшествия", "url": "https://www.mk.ru/rss/incident/index.xml", "category": "Происшествия", "filter": true, "strict": false },
+  { "name": "Lenta.ru — Силовые структуры", "url": "https://lenta.ru/rss/news/forces", "category": "Криминал", "filter": true, "strict": false },
+  { "name": "АиФ — Происшествия", "url": "https://aif.ru/rss/incidents.php", "category": "Происшествия", "filter": true, "strict": false },
+  { "name": "Mail.ru — Происшествия", "url": "https://news.mail.ru/rss/incident/", "category": "ЧП", "filter": true, "strict": false }
+]

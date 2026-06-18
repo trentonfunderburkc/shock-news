@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import LegalPageLayout from '../components/LegalPageLayout.astro';
+import { site } from '../lib/site';
+---
+
+<Layout title={`Политика cookies — ${site.name}`} description="Информация об использовании файлов cookie на сайте Гражданин">
+  <Header slot="header" />
+  <Footer slot="footer" />
+
+  <LegalPageLayout title="Политика использования cookies">
+    <p>
+      Сайт «{site.name}» использует файлы cookie и аналогичные технологии для обеспечения
+      корректной работы и анализа посещаемости.
+    </p>
+
+    <h2>1. Что такое cookies</h2>
+    <p>
+      Cookies — небольшие текстовые файлы, сохраняемые на вашем устройстве при посещении сайта.
+      Они помогают запоминать ваши предпочтения и собирать анонимную статистику.
+    </p>
+
+    <h2>2. Какие cookies мы используем</h2>
+    <ul>
+      <li><strong>Необходимые</strong> — обеспечивают базовую работу сайта (запоминание согласия на cookies);</li>
+      <li><strong>Аналитические</strong> — Яндекс.Метрика (подключается только после вашего согласия): посещаемость, поведение на сайте, источники трафика.</li>
+    </ul>
+
+    <h2>3. Управление cookies</h2>
+    <p>
+      При первом посещении вы можете принять все cookies или использовать только необходимые.
+      Вы также можете удалить cookies через настройки браузера. Отключение cookies может
+      ограничить функциональность Сайта.
+    </p>
+
+    <h2>4. Яндекс.Метрика</h2>
+    <p>
+      Сервис предоставляется ООО «Яндекс». Политика конфиденциальности Яндекса:
+      <a href="https://yandex.ru/legal/confidential/" target="_blank" rel="noopener">yandex.ru/legal/confidential</a>.
+      Opt-out:
+      <a href="https://yandex.ru/support/metrica/general/opt-out.html" target="_blank" rel="noopener">инструкция Яндекса</a>.
+    </p>
+
+    <h2>5. Контакты</h2>
+    <p>
+      Вопросы по cookies: {site.publisher.email}
+    </p>
+  </LegalPageLayout>
+</Layout>

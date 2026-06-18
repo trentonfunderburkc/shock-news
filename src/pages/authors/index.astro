@@ -1,0 +1,40 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import AuthorCard from '../../components/AuthorCard.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { authors } from '../../lib/authors';
+import { site } from '../../lib/site';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title={`Авторы — ${site.name}`} description="Редакционная команда и авторы портала Гражданин">
+  <Header slot="header" />
+  <Footer slot="footer" />
+
+  <div class="mx-auto max-w-7xl px-4 py-6">
+    <Breadcrumbs items={[{ label: 'Главная', href: base }, { label: 'Авторы' }]} />
+
+    <div class="bg-white border border-gray-200 p-6 sm:p-8 mb-8">
+      <h1 class="font-headline text-3xl font-bold text-gray-900">Авторы и редакция</h1>
+      <p class="mt-2 text-gray-600 max-w-2xl">
+        Материалы портала готовят журналисты и редакторы с опытом работы в социальной тематике.
+        Главный редактор — {site.publisher.editorInChief}.
+      </p>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {authors.map((author) => (
+        <AuthorCard author={author} />
+      ))}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+</style>

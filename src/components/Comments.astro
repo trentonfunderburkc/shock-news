@@ -1,0 +1,99 @@
+---
+interface Comment {
+  name: string;
+  text: string;
+  date: string;
+}
+
+interface Props {
+  comments: Comment[];
+}
+
+const { comments } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<section class="mt-8 bg-white border border-gray-200 p-6">
+  <h2 class="font-headline text-xl font-bold text-gray-900 pb-3 mb-4 border-b-2 border-[#c41e3a]">
+    Комментарии ({comments.length})
+  </h2>
+
+  <div class="space-y-4 mb-8">
+    {comments.map((comment) => (
+      <div class="border-l-2 border-gray-200 pl-4 py-1">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-semibold text-gray-800 text-sm">{comment.name}</span>
+          <time class="text-xs text-gray-400" datetime={comment.date}>
+            {new Date(comment.date).toLocaleDateString('ru-RU')}
+          </time>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed">{comment.text}</p>
+      </div>
+    ))}
+  </div>
+
+  <form id="comment-form" class="border-t border-gray-100 pt-6">
+    <h3 class="font-semibold text-gray-800 mb-1">Оставить комментарий</h3>
+    <p class="text-xs text-gray-500 mb-4">
+      Комментарии проходят премодерацию. Email не публикуется.
+    </p>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <input
+        type="text"
+        name="name"
+        placeholder="Ваше имя *"
+        required
+        class="border border-gray-300 px-4 py-2 text-sm focus:border-[#c41e3a] focus:outline-none focus:ring-1 focus:ring-[#c41e3a]"
+      />
+      <input
+        type="email"
+        name="email"
+        placeholder="Email (не публикуется)"
+        class="border border-gray-300 px-4 py-2 text-sm focus:border-[#c41e3a] focus:outline-none focus:ring-1 focus:ring-[#c41e3a]"
+      />
+    </div>
+    <textarea
+      name="text"
+      placeholder="Ваш комментарий *"
+      required
+      rows="3"
+      class="mt-4 w-full border border-gray-300 px-4 py-2 text-sm focus:border-[#c41e3a] focus:outline-none focus:ring-1 focus:ring-[#c41e3a]"
+    ></textarea>
+    <label class="mt-4 flex items-start gap-2 text-xs text-gray-600 cursor-pointer">
+      <input type="checkbox" name="privacy" required class="mt-0.5 shrink-0" />
+      <span>
+        Я согласен(на) с
+        <a href={`${base}privacy/`} class="text-[#c41e3a] underline" target="_blank">политикой конфиденциальности</a>
+        и
+        <a href={`${base}terms/`} class="text-[#c41e3a] underline" target="_blank">пользовательским соглашением</a>
+      </span>
+    </label>
+    <button
+      type="submit"
+      class="mt-4 bg-gray-900 px-6 py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+    >
+      Отправить на модерацию
+    </button>
+    <p id="comment-success" class="hidden mt-3 text-sm text-emerald-700 font-medium">
+      Спасибо! Ваш комментарий отправлен на модерацию.
+    </p>
+  </form>
+</section>
+
+<script>
+  document.getElementById('comment-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (window.CITIZEN_ANALYTICS) {
+      window.CITIZEN_ANALYTICS.reachGoal('comment_sent');
+    }
+    const form = e.target as HTMLFormElement;
+    form.reset();
+    document.getElementById('comment-success')?.classList.remove('hidden');
+  });
+</script>
+
+<style>
+  .font-headline {
+    font-family: var(--font-serif);
+  }
+</style>

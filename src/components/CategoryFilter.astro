@@ -1,0 +1,65 @@
+---
+interface Props {
+  categories: string[];
+  activeCategory?: string;
+}
+
+const { categories, activeCategory = 'all' } = Astro.props;
+---
+
+<div class="category-filter mb-6 flex flex-wrap gap-2" id="category-filter">
+  <button
+    type="button"
+    data-category="all"
+    class={`filter-btn px-4 py-1.5 text-sm font-medium border transition-colors ${activeCategory === 'all' ? 'bg-[#c41e3a] text-white border-[#c41e3a]' : 'bg-white text-gray-600 border-gray-200 hover:border-[#c41e3a] hover:text-[#c41e3a]'}`}
+  >
+    Все
+  </button>
+  {categories.map((cat) => (
+    <button
+      type="button"
+      data-category={cat}
+      class={`filter-btn px-4 py-1.5 text-sm font-medium border transition-colors ${activeCategory === cat ? 'bg-[#c41e3a] text-white border-[#c41e3a]' : 'bg-white text-gray-600 border-gray-200 hover:border-[#c41e3a] hover:text-[#c41e3a]'}`}
+    >
+      {cat}
+    </button>
+  ))}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.story-card');
+    const emptyMsg = document.getElementById('empty-filter-msg');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const category = btn.getAttribute('data-category');
+        if (!category) return;
+
+        if (window.CITIZEN_ANALYTICS && category !== 'all') {
+          window.CITIZEN_ANALYTICS.reachGoal('category_filter');
+        }
+
+        buttons.forEach((b) => {
+          b.classList.remove('bg-[#c41e3a]', 'text-white', 'border-[#c41e3a]');
+          b.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+        });
+        btn.classList.add('bg-[#c41e3a]', 'text-white', 'border-[#c41e3a]');
+        btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+
+        let visible = 0;
+        cards.forEach((card) => {
+          const cardCat = card.getAttribute('data-category');
+          const show = category === 'all' || cardCat === category;
+          (card as HTMLElement).style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+
+        if (emptyMsg) {
+          emptyMsg.classList.toggle('hidden', visible > 0);
+        }
+      });
+    });
+  });
+</script>
