@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://citizennews.space/sitemap.xml
+Sitemap: https://shocknews.space/sitemap.xml
