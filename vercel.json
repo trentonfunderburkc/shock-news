@@ -3,6 +3,5 @@
   "framework": "astro",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "installCommand": "npm ci",
-  "ignoreCommand": "node scripts/vercel-should-build.js"
+  "installCommand": "npm ci"
 }
